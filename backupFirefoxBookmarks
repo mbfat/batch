@@ -1,0 +1,59 @@
+@ECHO OFF
+TITLE Backup Script by IceLancer
+::== NOTES ==
+::Info           : Backup Files and Folders
+::Creator       : IceLancer
+::OS             : Windows XP/Vista/7/8 (32-bit and 64-bit)
+::Languages     : English
+::Created       : February 08, 2015
+REM -------------------------------------------------------
+::variables
+::1.DropboxBackup : Put Link to folder of your Dropbox (google/dropbox...)
+::2.LocalBackup : Put Link to folder of desired Local Backup
+::3.Name         : Set Folder Name of Backup
+::4.FilesToBackup : Files you wish to make Backup of
+REM -------------------------------------------------------
+REM Change this to TRUE if you want Online things enabled
+REM Or set it to FALSE if you do not
+SET ONLINE_ENABLED=FALSE
+
+::1.DropboxBackup
+set DropboxBackup=c:\My Documents\GoogleDrive
+::2.LocalBackup
+set LocalBackup=d:\ono\Windows_RAD\Firefox ADDON\FIREFOX BEKAP\manual_bekap
+
+::3.Name
+set Name=Beckup
+::4.FilesToBackup
+set FilesToBackup=%APPDATA%\Mozilla\Firefox\Profiles
+
+color 0A
+set backupcmd=xcopy /s /c /d /e /h /i /r /y
+
+echo =======================================
+echo Backing up Files
+echo =======================================
+for /f "tokens=2 delims==" %%a in ('wmic OS Get localdatetime /value') do set "dt=%%a"
+set "YY=%dt:~2,2%" & set "YYYY=%dt:~0,4%" & set "MM=%dt:~4,2%" & set "DD=%dt:~6,2%"
+set "HH=%dt:~8,2%" & set "Min=%dt:~10,2%" & set "Sec=%dt:~12,2%"
+set "datestamp=%DD%%MM%%YYYY%" & set "timestamp=%HH%%Min%%Sec%"
+set "fullstamp=%DD%-%MM%-%YYYY%_%HH%-%Min%-%Sec%"
+::echo datestamp: "%datestamp%"
+::echo timestamp: "%timestamp%"
+echo fullstamp: "%fullstamp%"
+
+set folder=%fullstamp%
+
+REM If Online option is enabled, make the online backup
+IF '%ONLINE_ENABLED%'=='TRUE' (
+  ECHO Backing up SAVE files to DropBox:
+  %backupcmd% "%FilesToBackup%" "%DropboxBackup%\%Name%\%folder%"
+  ECHO Backing up SAVE files to LocalBackup:
+  %backupcmd% "%FilesToBackup%" "%LocalBackup%\%Name%\%folder%"
+) ELSE (
+  ECHO Backing up SAVE files to LocalBackup:
+  %backupcmd% "%FilesToBackup%" "%LocalBackup%\%Name%\%folder%"
+)
+
+echo Backup ended! Press any key to close.
+pause > nul
